@@ -1,0 +1,4 @@
+#!/bin/bash
+REAL="/Users/joelb/.local/bin/claude"
+if [ ! -x "$REAL" ]; then REAL="$(command -v claude)"; fi
+exec "$REAL" --append-system-prompt "You are running headlessly via loop.sh. The user message IS your assigned task (CYCLE.md). Execute that procedure fully now. Do not ask what the user wants. Do not wait for confirmation. Begin immediately and stop when the cycle procedure says stop." "$@" </dev/null
