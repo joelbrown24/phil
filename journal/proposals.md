@@ -3556,3 +3556,27 @@ watch.py shape regexes, subclass auto-tagger.
 **Status:** relaxation fork NOT MET (12th; f4 fold pnl -3.34 after
 MrBeast pair). 0 bets placed, 0 settled, 4 open (RBA No effectively
 lost). No reverts; two playbook hygiene rules.
+
+## 2026-09-27 16:10Z — operator loop.sh push stuck on a two-runner divergence
+
+**Symptom:** two operator cycles in a row (fce9fee 13:58Z, 86e5d07 15:45Z)
+never reached origin. Local main is ahead 2 / behind 1 of origin/main
+37e0ea0 (the 14:25Z cloud cycle). Both sides have only journal/strategy
+append changes. This cycle's commit makes it ahead 3.
+
+**Likely cause:** both sides appended rows to `journal/forecasts.jsonl`
+(cloud +2, operator +4, now +5). `.gitattributes` deliberately leaves that
+file out of `merge=union` because resolve.py updates rows in place. So
+loop.sh's `git pull --rebase` conflicts and aborts ("commits are local
+only"). The operator-side session cannot run `git rebase` (sandbox
+approval gate), and the procedure forbids resolving it by hand or by
+reset. Every later operator cycle adds to the pile, and origin never sees
+operator forecasts.
+
+**Ask (operator):** resolve once by hand (rebase, keep both sides'
+appended forecast rows, since the ids are distinct). Then pick one:
+(a) a custom merge driver for forecasts.jsonl that unions by `id` and
+takes the settled version of any row both sides changed, or (b) have
+loop.sh fail loudly (non-zero exit / notification) when its rebase
+aborts, instead of a stderr warning the next cycle only learns about
+from ahead/behind counts. Status: PROPOSED (operator).
