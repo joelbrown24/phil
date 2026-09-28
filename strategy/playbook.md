@@ -6846,3 +6846,32 @@ wide-spread-veto or outside-view-veto dBrier for a boundary decision,
 quote it WITH and WITHOUT refusals. The P&L column already excludes them.
 The veto boundary stays unchanged. Its fillable P&L is still −$25.04 over
 20 trades.
+
+## 2026-09-28 01:55Z update: one `wide-spread-veto` row settled (Burleson MLB RBI leader)
+
+| Row | own / mid | side | ask-edge | outcome | CF pnl |
+|---|---|---|---|---|---|
+| Burleson leads MLB RBIs (`18a43357718b`, wide-spread-veto, settled 2026-09-28T01:42:51Z, graded in RETRO-20260928-0155) | 0.93 / 0.73 | Yes | +0.04 (ask 0.89, bid 0.57) | Yes | +0.62 |
+
+Mechanical ledger after this row (`core/counterfactual.py ledger
+--skip-reason wide-spread-veto`): 24 settled declined forecasts, 21
+fillable CF trades, 3 refused, 12W/9L, pnl −$24.42 (staked $105.00),
+brier_delta −0.0454, held-out −$16.60. Side split: no 13 rows/11 trd/
+5W-6L/−$19.79 (unchanged); yes 11 rows/10 trd/7W-3L/−$4.63 (was 10/9/
+6W-3L/−$5.25). Check: −19.79−4.63=−24.42 ✓. Ruling: no boundary change.
+The veto was correct on method even though the trade would have won: the
+ask-edge was 0.04 on a 5-share ask, and most of the 0.20 gap to the mid
+was the book's empty bid side, not a price anyone was selling at. The
+same mid-price-illusion shape as the Lowe's row above.
+
+**mlb-futures end-of-season arithmetic (forecasts only, n=6 rows on 3
+markets, all settled 2026-09-28).** PHI and ARI wild card, plus Burleson
+RBI leader: all six rows went the way my estimate leaned. My Brier beat
+the mid on 5 of 6. The one miss was PHI Game-162 at 0.79 vs mid 0.83.
+The method was standings, tiebreak order, and a per-game devig or per-PA
+simulation, re-recorded after each game. It gave small, consistent
+information edges (+0.01 to +0.05 vs mid) that sat below the book-devig
+0.07 floor. The one large gap (Burleson 0.93 vs 0.73) was a spread
+artifact. Rule: keep researching final-week clinch and stat-leader
+markets as FORECAST fodder. Do not lower the floor for them. Three events
+is too few, and the edges are the size of normal spread noise.
