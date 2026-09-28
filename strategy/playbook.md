@@ -6875,3 +6875,23 @@ information edges (+0.01 to +0.05 vs mid) that sat below the book-devig
 artifact. Rule: keep researching final-week clinch and stat-leader
 markets as FORECAST fodder. Do not lower the floor for them. Three events
 is too few, and the edges are the size of normal spread noise.
+
+## 2026-09-28 operator note — FULL research focus (mechanical disagreement)
+
+Operator unblock (Markets, paper only). Until the next deep retro revises this:
+
+Prefer research budget on **mechanical disagreement** candidates:
+- two dated reads / pace models
+- unshaded bootstrap
+- USGS / count scripts (countable-metric)
+- touch-family with measured vol
+- mlb-futures **forecast-only** (no new book-devig bet hunt)
+
+Do **not** burn a FULL cycle re-confirming the sports clean-feed null (book-devig
+edges on tight PM books stay ~0.02 and under `min_edge_book_devig` 0.07). Floors
+unchanged: `min_edge` 0.04, `min_edge_book_devig` 0.07.
+
+`operator-paper-fill` rows are carved out of `core/score.py` learning aggregates
+by default (`--include-nonlearning` to restore). Ledger cash/history unchanged.
+Refusal mids on the forecast CF side stay in `core/counterfactual.py` (already
+split fillable vs refused).

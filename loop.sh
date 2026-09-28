@@ -156,10 +156,18 @@ PY
   # step 9 and its rebase path mandate exactly these commands, and a
   # permission-blocked "checkout -B" strands the cycle's commits on a
   # detached HEAD (2026-08-28).
+  # Research tools live under strategy/tools/ (quote/devig/siblings/touch/…).
+  # Without Bash(python3 strategy/tools/*), FULL cycles hit "requires approval"
+  # pre-execution and silently lose ask-checks and book-devig tooling
+  # (operator proposals 2026-09-27 22:33Z / 23:02Z). Env reads are needed for
+  # PHIL_LEASE / PHIL_PUSH_BY_LOOP. git push stays OUT — loop.sh owns the push
+  # below (keyring is unlocked in this shell, not inside claude -p).
   CMD=(claude -p "$PROMPT" --model "$MODEL"
        --allowedTools "Read" "Glob" "Grep" "WebSearch" "WebFetch"
          "Edit" "Write" "Task"
-         "Bash(python3 core/*)" "Bash(git add:*)" "Bash(git commit:*)"
+         "Bash(python3 core/*)" "Bash(python3 strategy/tools/*)"
+         "Bash(printenv:*)" "Bash(env:*)"
+         "Bash(git add:*)" "Bash(git commit:*)"
          "Bash(git rev-parse:*)" "Bash(git log:*)" "Bash(git diff:*)"
          "Bash(git status:*)" "Bash(git symbolic-ref:*)"
          "Bash(git merge-base:*)" "Bash(git rev-list:*)"

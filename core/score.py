@@ -10,7 +10,13 @@ Reports, overall and per category:
 Also a calibration table (est-prob buckets vs realized frequency) and
 per-strategy-revision P&L so self-improvement is measurable across commits.
 
-Usage: python3 core/score.py [--json] [--skip-mtm]
+Usage: python3 core/score.py [--json] [--skip-mtm] [--include-nonlearning]
+
+Learning aggregates (overall / by_category / by_edge_class / calibration /
+luck_adjusted) exclude rows whose strategy_rev is listed in NONLEARNING_REVS
+(currently operator-paper-fill). Those rows stay in the ledger for cash/history
+and still appear under by_strategy_rev. Pass --include-nonlearning to fold them
+back into the learning cells.
 """
 import argparse
 import datetime as dt
@@ -26,6 +32,15 @@ import pmapi  # noqa: E402
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 LEDGER = ROOT / "journal" / "ledger.jsonl"
 FORECASTS = ROOT / "journal" / "forecasts.jsonl"
+
+# Operator-injected paper fills stay on the ledger for cash/history but must
+# not contaminate strategy learning cells (category, edge class, calibration).
+# Exact match on strategy_rev; extend this frozenset for new operator-only revs.
+NONLEARNING_REVS = frozenset({"operator-paper-fill"})
+
+
+def is_nonlearning(entry):
+    return (entry.get("strategy_rev") or "") in NONLEARNING_REVS
 
 
 def stats(entries):
@@ -270,27 +285,43 @@ def main():
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--skip-mtm", action="store_true",
                     help="skip live mark-to-market of open positions (offline)")
+    ap.add_argument("--include-nonlearning", action="store_true",
+                    help="include operator-paper-fill (etc.) in learning aggregates")
     args = ap.parse_args()
 
     entries = [json.loads(line) for line in LEDGER.read_text().splitlines() if line.strip()] \
         if LEDGER.exists() else []
     frows = [json.loads(line) for line in FORECASTS.read_text().splitlines() if line.strip()] \
         if FORECASTS.exists() else []
-    settled = [e for e in entries if e["status"] in ("won", "lost")]
-    if not settled:
+    settled_all = [e for e in entries if e["status"] in ("won", "lost")]
+    nonlearning = [e for e in settled_all if is_nonlearning(e)]
+    settled = settled_all if args.include_nonlearning else [
+        e for e in settled_all if not is_nonlearning(e)]
+    if not settled_all:
         print(json.dumps({"settled": 0, "open": sum(1 for e in entries if e["status"] == "open"),
                           "forecasts": forecast_report(frows)}))
         return
 
     report = {"overall": stats(settled), "luck_adjusted": luck_adjusted(settled),
               "by_edge_class": {}, "by_category": {}, "by_strategy_rev": {},
-              "calibration": [], "forecasts": forecast_report(frows)}
+              "calibration": [], "forecasts": forecast_report(frows),
+              "excluded_nonlearning": {
+                  "n": len(nonlearning),
+                  "revs": sorted({e.get("strategy_rev") or "unknown" for e in nonlearning}),
+                  "pnl_usd": round(sum(e["pnl_usd"] for e in nonlearning), 2),
+                  "included_in_learning": bool(args.include_nonlearning),
+                  "note": ("included in learning aggregates via --include-nonlearning"
+                           if args.include_nonlearning else
+                           "excluded from overall/category/edge/calibration; "
+                           "still listed under by_strategy_rev; ledger unchanged"),
+              }}
     by_class = defaultdict(list)
     by_cat = defaultdict(list)
     by_rev = defaultdict(list)
     for e in settled:
         by_class[e.get("edge_class") or "unclassified"].append(e)
         by_cat[e["category"]].append(e)
+    for e in settled_all:
         by_rev[e.get("strategy_rev") or "unknown"].append(e)
     for cls, es in sorted(by_class.items()):
         report["by_edge_class"][cls] = stats(es)
@@ -318,6 +349,11 @@ def main():
         return
     o = report["overall"]
     print(f"settled={o['n']} win_rate={o['win_rate']} pnl=${o['pnl_usd']} roi={o['roi']}")
+    ex = report.get("excluded_nonlearning") or {}
+    if ex.get("n"):
+        mode = "INCLUDED" if args.include_nonlearning else "excluded"
+        print(f"nonlearning ({mode}): n={ex['n']} revs={ex['revs']} "
+              f"pnl=${ex['pnl_usd']} (ledger cash unchanged)")
     print(f"brier: agent={o['brier_agent']} market={o['brier_market']} "
           f"delta={o['brier_delta']} ({'BEATING market' if o['brier_delta'] < 0 else 'behind market'})")
     la = report["luck_adjusted"]

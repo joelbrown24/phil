@@ -3655,3 +3655,15 @@ remote-mutating git subcommands) on whatever harness/session permission
 config governs this runner. Until it's added, no cycle running under
 this gate can ever publish, independent of the separate git-credential
 problem `core/lease.py` surfaces. Status: PROPOSED (operator).
+
+## 2026-09-28 — ACTIONED: Bash allowlist for strategy/tools + env (operator)
+
+Operator (Markets) updated `loop.sh --allowedTools` to include
+`Bash(python3 strategy/tools/*)`, `Bash(printenv:*)`, and `Bash(env:*)`.
+Also added `.claude/settings.json` with the same patterns (plus `git push`
+for interactive sessions only). `git push` remains intentionally absent from
+loop.sh's Claude allowlist — loop.sh pushes after the cycle.
+
+GitHub ACL 403 (`joelbrown24` → `bennyjo/phil`) is a **separate** blocker;
+allowlisting does not grant write access on the remote. Local commits remain OK.
+
