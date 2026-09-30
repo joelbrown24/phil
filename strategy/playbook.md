@@ -4,6 +4,16 @@ AGENT-EDITABLE. This file is mine (the trading agent's) to rewrite as I learn.
 Every edit must be justified by evidence from settled positions (see
 `journal/retros/`). Version: v0 — seeded by the operator, unproven.
 
+**How to read this file (DEEP-2026-09-30).** It is ~450KB / 7,100 lines,
+and a default Read returns only the first 2,000 lines. Anything below
+line 2,000 is invisible unless you page to it. That includes every
+ruling added since mid-August. Each FULL cycle: run `grep -n '^## '
+strategy/playbook.md` for the section map, then read the sections that
+match the candidates in hand, plus every `DEEP-*` rulings section from
+the last 7 days. Those sit at the end of the file. Settled narrative
+lives in `strategy/playbook-archive.md`. You do not need to read it
+per cycle.
+
 ## Thesis
 
 I cannot out-research the market on everything. I can win where (a) the market
@@ -852,6 +862,26 @@ isn't the favorite, log `benchmark-unreachable` immediately rather than
 spending a devig call on the wrong-side market — the favorite-side
 sibling is where the real (usually null) signal lives.
 
+**Generalization: the invariant is favorite/underdog, not home/away
+(TRIGGERED 2026-09-30 03:38Z, `newmarket:5146462`).** BOS@NYY produced a
+`mlb-...-spread-away-1pt5` market, `Spread: Boston Red Sox (-1.5)` (away
+team as -1.5 favorite side) — a variant this playbook hadn't named
+before (prior instances were always the home-anchored slug). Moneyline
+devig (median 8 books, power) had NYY (home) favored 0.558 vs PM 0.555;
+the away-anchored candidate (BOS -1.5, i.e. BOS winning by 2+) has no
+book equivalent for the same reason a not-favored home spread doesn't —
+sportsbooks quote only the favorite's -1.5 / underdog's +1.5, never the
+reverse, regardless of which side is home. Logged `benchmark-unreachable`
+on 5146462 without spending a devig call on it. The correctly-favorite-
+side sibling this game, `Spread: New York Yankees (-1.5)` (5146421, home
+AND favorite here), devigged clean: PM 0.35 vs sportsbook power-devig
+0.353 — another clean-feed-null. Rule restated to cover both slugs: for
+ANY PM `-1.5` spread market (home- or away-anchored slug alike), check
+the moneyline devig first; if the team named in that specific market is
+NOT the moneyline favorite, log `benchmark-unreachable` immediately —
+only the favorite-side sibling (whichever team, whichever slug) is ever
+directly benchmarkable from `core/odds.py`'s single reported spread line.
+
 **First clean-feed sweep result (2026-08-09 02:12Z, DEEP-2026-08-09):** the
 feed's first working cycle devigged 7 favorite-framed MLB -1.5 spreads and 2
 WNBA markets (2+2 credits, 9 books deep): max nominal edge **0.018** at the
@@ -1497,6 +1527,31 @@ exact-date ladders) share that single slot — a coherent family estimate
 is one research act. Exception: an official confirmation landing (the
 event stops being a rumor) lifts the cap for that event, since the
 market may then be bettable as an info-race.
+
+**AI release-date anchoring rule (RETRO-20260928-2015).** When no primary
+source (an official post, docs page or named-exec statement) gives a date,
+the recorded est_prob for an AI or product release-date rung (by-date or
+exact-date) is the ladder mid. A lean built from leaks or aggregators goes
+in the note as "shade view: X" and does not go into est_prob. Evidence: 7 of 7
+"later than the market" reads have now resolved against me. These are the
+four Opus No-reads on 09-22/23 and the three Sonnet 5.5 rows on 09-28
+(`298455f0923c`, `b5144f22aaaa`, `e4910305e1c3`: own 0.38/0.55/0.65 vs mid
+0.475/0.68/0.875, each dBrier about +0.10). ai-model-release forecasts sit at
+brier_delta +0.0838 on n=35. A primary-source check (news page, models page)
+still runs, but only a POSITIVE finding (the launch is live, or an official
+date) moves est_prob off the mid. "Not out yet" earlier on the day moves
+nothing. Re-grade the shade views at n=8.
+
+**Treasury touch drift rule (RETRO-20260928-2215).** For a Treasury
+par-yield touch rung ("hit X% in <month>") with 5 or fewer prints left,
+the recorded est_prob is the RAW bootstrap (drift kept), updated for the
+overnight futures move. Driftless and demeaned reads go in the note as
+"shade view: X" and never into est_prob. Evidence: every near-rung row
+that dropped drift lost to the mid, 5 of 5 (`03f07792d701`, `fdedb184ad3e`,
+`8b9d86b667bb`, `3ed526b57eca`, `84012264b65d`); the one raw-bootstrap
+row `99df204b7f85` (0.67 vs mid 0.54) beat the mid. Far-rung sd (model
+wider than PM's compressed ladder, RETRO-20260924-2213) is untouched.
+Touch rows stay forecast-only. Re-grade at the next monthly ladder.
 
 Work from `core/scan.py` output (protected filters already applied).
 Prefer, in order:
@@ -3108,6 +3163,23 @@ reachable again; criterion (a) still needs the dip split to beat the
 market on decision-weighted Brier. Ruling unchanged: forecast-only
 "indefinitely" stands until a deep retro re-grades against the full
 pre-registered bar, and a reach-only slice never re-opens it.
+
+**2026-09-27 18:1xZ (RETRO-20260927-1815): scheduled-close crypto
+strikes/brackets are a SEPARATE family from touch, and my realized-vol
+read has lost all three.** `ed46e73085f3` (BTC $76-78k Sep 12, own 0.53 vs
+mid 0.945), `4a1df602fb13` (ETH $2.5-2.6k Sep 12, own 0.55 vs 0.705) and
+`a10c93456a38` (BTC above $84k Sep 27, own 0.60 vs 0.745) all settled
+Yes; the market was closer on 3 of 3 (row dBrier +0.35 / +0.11 / +0.10).
+Common cause, not variance: each time my sd came from a realized-vol
+window (7d hourly, or read noise) that was wider than the sd the sibling
+ladder implied, and a wider sd pulls a near-the-money favorite toward
+0.5. On `a10c93456a38` the note already had the answer: siblings implied
+sd ~0.9% (vs my 1.63%), and the 24h vol gave 0.76. **Rule:** on a
+scheduled-close crypto strike or bracket that has a sibling ladder, the
+recorded est uses the ladder-implied sd unless a dated, sourced catalyst
+inside the window (CPI, FOMC, listing, unlock) justifies a wider one;
+the realized-vol read goes in the note as a sensitivity. Forecast-only
+stands (n=3, and matching the ladder cannot beat it). Re-grade at n=8.
 
 Excluded per the sub-boundary taxonomy (DEEP-2026-08-15): Zambia
 (fa185b55a5c3, edge 0.06) and Musk wk 200-219 (7808b6f5a4ef, edge 0.045)
@@ -6181,6 +6253,24 @@ the n>=6 bar is reached. No playbook policy change yet — one game is not
 a sample, but the single data point points toward the right-skew
 overstatement risk being real rather than illustrative.
 
+**Second candidate instance, imported-sigma sub-variant, NOT yet tallied
+(2026-09-30 01:xxZ TRIGGERED cycle):** AL Wild Card Game 2, CWS@HOU, two
+new PM markets (5144942 O/U8.5, 5144941 O/U6.5) fired the watcher on
+creation, starters TBD. Unlike SD@COL, `core/odds.py` returned NO cross-
+book dispersion here — all 8 books quote the identical 7.5 line, power-devig
+consensus P(Over 7.5)=0.504 (spreads <=0.08, essentially fair). With no
+fresh line spread to fit mu/sigma from, sigma=4.39 was imported unchanged
+from the SD@COL fit rather than refit — a weaker instance methodologically
+(external parameter vs in-game data), so it is recorded as forecast-only
+(`090e99f18536` Over8.5 est 0.41, `8f80c89cb1a0` Over6.5 est 0.59 — both
+skip-reason `no-edge`, both edges <=0.04 anyway so the floor alone would
+have blocked a bet regardless of method status) but flagged separately
+rather than folded into the SD@COL n>=6 count. Grade at settlement
+(~2026-09-30 21:00Z) same as SD@COL (direction-of-miss, book-line
+context), and decide then whether tight-single-line + imported-sigma
+belongs in the same tally as multi-line + fitted-sigma, or needs its own
+bar.
+
 ## Mech second opinions: request sequencing and what the pair showed (2026-09-07 08:0xZ)
 
 Two settled instances now show the same off-chain failure shape:
@@ -6806,23 +6896,6 @@ above), no price in the prompt text, sequential sends, `mechlog.py
 record` on every attempt including failures. This cycle's own research
 step counts toward today's sample-of-3 tally.
 
-## 2026-09-26 21:39Z update: one `wide-spread-veto` refusal settled (biggest-quake Sep25 ≥6.1)
-
-`f7fcd3a05a31`, recorded 2026-09-26T04:16:55Z, own est 0.97 vs a bid-only
-mid of 0.36 — Yes had no ask in the book at record time (USGS already
-showed a confirmed M6.6, next-largest 5.5), so this was a **refusal**
-("no ask at record time"), not a fillable trade — same shape as the
-2026-09-09 `9eff80f25296` precedent. Settled WON. No new P&L row: a
-refusal contributes to the settled-row count only, neither side's trade
-tally. Current mechanical ledger (`core/counterfactual.py ledger
---skip-reason wide-spread-veto`): 23 settled declined forecasts, 20
-fillable CF trades, 3 refused, 11W/9L, pnl −$25.04 (staked $100.00),
-brier_delta −0.0444, held-out −$17.22. Side split unchanged by this row:
-no 13 rows/11 trd/5W-6L/−$19.79; yes 10 rows/9 trd/6W-3L/−$5.25. Check:
-−19.79−5.25=−25.04 ✓. Ruling: no boundary change — correct estimate,
-correctly unfillable, doesn't move the standing (still net-negative)
-wide-spread-veto read. Full grading in RETRO-20260926-2143.
-
 ## DEEP-2026-09-27 additions
 
 **One label for view-count brackets: `video-views`.** The MrBeast
@@ -6847,6 +6920,194 @@ quote it WITH and WITHOUT refusals. The P&L column already excludes them.
 The veto boundary stays unchanged. Its fillable P&L is still −$25.04 over
 20 trades.
 
+## DEEP-2026-09-28 notes
+
+- **Settled watch items move to `strategy/watch-archive.md`.** Once every
+  id a `schedule.json` watch item carries has settled AND been graded in
+  a retro, move the item verbatim to the archive instead of leaving an
+  "ARCHIVED:" stub in the file every tick reads. Eleven items went today
+  (schedule.json 82KB -> 69KB). Keep an item while any joint grading it
+  names is still owed (the Sweden trio waits on e746d7e1ba99; the Sep 20
+  joint set waits on its last open leg).
+- **Crypto touch keeps drifting toward the market.** The cell went
+  −0.0307 (n=16, DEEP-2026-09-24) to **−0.0204 (n=19)**. All three
+  Sep 21-27 weekly touch rows settled this window with own further from
+  the outcome than the mid (efa75442 +0.009, 6f5b7cf4 +0.006, fd59af69
+  BTC $88k own 0.41 vs 0.285, +0.087). This confirms the 2026-09-24
+  retirement of touch rows as a research priority. Do not re-open it on
+  the cell's still-negative sign: it is shrinking toward zero with n.
+- **Scheduled-close crypto uses ladder-implied sd (5eed485): kept.** The
+  rule fixes a real method error (3 of 3 realized-vol reads were wider
+  than the ladder and lost to it). Forecast-only stands; re-grade at n=8.
+
+## New benchmark: Parcl Labs daily index, readable via public API (2026-09-29 00:3xZ, FULL cycle, cloud)
+
+Polymarket's "median home value in <city> on <date>" bracket sets resolve on
+the Parcl Labs Sales Price Index (price/sqft x a fixed sqft multiplier stated
+in the market text). The resolution page is JS-rendered, but the page's own
+data call is public and keyless:
+`POST https://api-app-service.parcllabs.com/v1/price-feeds/history` with
+`{"parcl_ids":[<id>],"start_date":"2020-01-01"}` returns the daily series.
+**Validation:** today's history matched all 4 resolved NYC brackets (Feb 1,
+Mar 1, Apr 1, Apr 30 2026; two sat within 0.7 idx of an edge and still
+agreed). So the published history is the resolver's value, and late revisions
+are not a live risk on that evidence.
+
+Method: take the latest print, measure the index move needed to cross each
+bracket edge by the resolution date, and read the empirical frequency of
+that move over 2020-26 horizon-matched changes, both unconditional and
+conditioned on a similar prior 2-day trend. **Bet rule for first contact:**
+bet only legs where the conditional sample has ZERO crossings and the
+unconditional rate is <= ~3%. Legs whose outcome depends on momentum
+continuing (SF 1.176M edge, DC 524K edge) stay forecast-only. Placed
+3c4304fb1d0a NYC 663-689K, 95624b8c75a0 Chicago 340-345K, 22456f76e62d LA
+1.153-1.169M ($5 each, edge_class other). Forecast-only: DC 9160ae7137c4
+(no-edge), SF 7f5d8917f569 (outside-view-veto, 0.11), US 02d351f38d7d /
+db7b69c95a4b (market-agrees).
+**Pre-registered grading (Sep 30 values, settle ~Oct 1):** if all three bets
+win and the DC/SF forecasts land on the side the momentum read implied, keep
+the zero-crossing rule and extend it to the next monthly set. Any loss on a
+zero-crossing leg means the empirical tail understates the resolver's
+variance, so the family goes forecast-only. The same applies if a leg settles
+on a value that differs from the API history for that date. These three legs
+share one data source and one method, so grade them as ONE decision, not
+three independent outcomes.
+
+## DEEP-2026-09-29 rulings
+
+- **AI release-date anchoring rule (abb6dcc): KEPT.** The "7 of 7" count
+  covers about 3 markets, not 7: 298455f0923c was superseded by
+  b5144f22aaaa, and the four Opus rows cover two or three rungs of one
+  launch. So the effective evidence is about **2 launch events** (Opus
+  and Sonnet 5.5), and both came earlier than the leak-based lean said.
+  I still keep the rule. The category-level number stands on its own
+  (ai-model-release forecasts n=35, dBrier +0.0838). The rule only moves
+  est_prob to the mid, and it keeps the lean in the note, so its
+  downside is capped at "no information added". Re-grade the shade
+  views at n=8 **distinct markets**, not n=8 rows.
+- **Treasury touch drift rule (4fb1a1d): KEPT, SHARPENED.** The "5 of 5"
+  is also rows, not markets. fdedb184ad3e -> 8b9d86b667bb ->
+  3ed526b57eca is one 10y 5.20% market re-recorded three times, so the
+  evidence is **3 markets** (30y 5.39%, 10y 5.20%, 30y 5.55%) plus one
+  raw-bootstrap win (99df204b7f85), all from a single September ladder
+  in which yields trended up. "Drift kept" beats "driftless" exactly
+  when the trend continues, so this is one regime, not a method proof.
+  The rule stays because it only governs what goes into a forecast-only
+  row. At the October ladder re-grade, split the grading by whether the
+  month trended. If a flat or reversing month shows the raw-drift est
+  losing to the mid, revert to the mid (not to driftless).
+- **NEW: feed-backed families get a mechanical look that does not
+  depend on screener divergence (sensing).** The Parcl home-value
+  family was in the scan pool and screened **362 times over 14 days
+  (Sep 16-29)**. Every row had divergence 0.0, confidence `low`, and a
+  reason like "Need current Parcl Labs home value data". The screener
+  prompt says to do exactly that (it cannot browse), and escalation
+  ranks by divergence, so a family whose answer is one keyless API call
+  away could never reach research. One direct lookup (00:3xZ Sep 29)
+  produced 3 floor-clearing bets. Since Sep 22, 6,344 of 16,800
+  screened rows (38%) are this "no data, echo the mid" shape, mostly
+  crypto/Treasury/WTI rungs that already have methods. Rule: keep a
+  short list of **validated-feed families**, meaning the resolver's
+  source is readable keyless and a past resolution was matched against
+  it. Each FULL cycle checks ONE family from the list outside the 15
+  escalation slots, rotating, and records forecasts for every leg read.
+  The initial list is Parcl home-value (4/4 NYC resolutions matched)
+  and USGS M5.5+ weekly counts (aea0ebb45997 won on the count). A
+  family is added only after a resolution-match check. **Retire the
+  sweep** if 7 days of rotation produce no leg with ask-edge >= min_edge
+  outside the Parcl set. This rule is about sensing only. It grants no
+  betting permission beyond the existing floors and family rules.
+- **NEW: first-contact family stake cap (discipline).** Until a new
+  benchmark family has its first settlement, the TOTAL open stake across
+  that family is capped at max_stake_per_event_usd ($10), even when the
+  legs are nominally different events. The 09-29 Parcl trio (3c4304fb1d0a,
+  95624b8c75a0, 22456f76e62d, $15 total) complied with every written
+  floor. The playbook itself says to grade them as ONE decision, though,
+  because the resolver-equals-API assumption is shared, and a $15
+  single-thesis exposure is above what the per-event cap exists to
+  enforce. The precedent is the Lake America pair (bbe450e04eb9 +
+  6f7dfb5b7c0c), one shared thesis at -$10, which the cap contained.
+  This is not a violation on record, since no written rule was broken.
+  It applies from now on, including to the October Parcl set if the
+  09-30 grade passes.
+- **Canada GDP flash->first-print method: first settled validation
+  (RETRO-20260929-1545).** Jul 2026: flash "essentially unchanged",
+  print 0.0%. Bet 05333272be9d (0.0-0.1 Yes, own 0.63 vs ask 0.57) won
+  +$3.77, dBrier -0.048. Both sibling forecasts (<0 at 0.25, 0.2-0.3 at
+  0.11) also beat the mid. Keep the 14-month flash-error table as the
+  benchmark for StatCan monthly GDP brackets. Any directional tilt layered
+  on top (the Jul "tilt up" from the wholesale revision) is unvalidated:
+  cap it at 0.05 of bracket mass until it has its own graded evidence.
+
+## DEEP-2026-09-30 rulings
+
+- **Per-settlement counterfactual arithmetic goes in the retro, not
+  here.** Seven "YYYY-MM-DD HH:MMZ update: N rows settled" sections
+  (Sep 26-29) restated `core/counterfactual.py ledger` totals, and each
+  ended "Ruling: no boundary change". That was about 8KB in four days,
+  none of it a rule. They moved verbatim to `strategy/playbook-archive.md`.
+  From now on, a CF settlement is graded in the RETRO file. The playbook
+  gains a line only when a boundary, gate or method changes. The
+  mechanical ledger is authoritative, so the hand-kept table under
+  "Outside-view veto: settled counterfactual ledger" stays frozen as
+  `core/counterfactual.py reconcile`'s input. Do not append to it.
+- **Rules carried out of the archived sections (unchanged, still live):**
+  - JOLTS: record the LinkUp model centre. Do not tilt past consensus on
+    soft signals. The cap is zero past consensus until there is graded
+    evidence. For StatCan GDP the cap is 0.05 of bracket mass.
+    (RETRO-20260929-1800, n=1, wash.)
+  - Econ ladders: record every bracket whose book was read, centre
+    included. (The Aug JOLTS print landed in an unrecorded bracket.)
+  - Unexplained price moves against a public-record-search estimate:
+    **tracked observation, 1-for-2, not a rule.** The Sep 21 Opus case:
+    discounting the move was right. The Sep 29 Trump-renames-AI chain
+    e22fb0445ebe: the market was right. Re-visit at the third instance.
+- **Funnel row is not optional on a FULL cycle.** Two of the seven FULL
+  cycles in the Sep 29 window wrote "Funnel: screened 300, escalated 15"
+  into cycles.log but committed no `strategy/funnel.jsonl` row: 41b031e
+  (15:51Z cloud) and d43503c (18:35Z operator). The screener rows landed
+  and the funnel row did not. Before committing a FULL cycle, check that
+  `tail -1 strategy/funnel.jsonl` carries this cycle's timestamp.
+- **Grade settlements on the tick that settles them, LIGHT included.**
+  This is already the schedule.json `_comment` rule. The hourly agent
+  reports it being missed (proposal 2026-09-29 18:0xZ: Canada GDP was
+  graded 70 minutes late, JOLTS about 2h late). It is restated here, near
+  the rulings every FULL cycle reads, until the CYCLE.md wording is fixed.
+- **Category tag on a superseding row: copy the superseded row's tag.**
+  The Trump-renames-AI chain went politics-general (f0f55638c536) ->
+  news (f85a9b197bc6, e22fb0445ebe). This breaks the DEEP-2026-09-20
+  immutable-tag rule. It also moved the question into the news cell's
+  process-shape bar mid-chain. If the first tag was wrong, say so in the
+  note and keep it anyway. Cell stats depend on one market = one cell.
+- **RBA 4ed738b2045b (cross-market, LOST −$5): no rule, n=1.** The
+  hourly lesson stands as an observation. The lesson: a single
+  central-bank futures read 13 days out, used to fade a PM price that
+  leans the same direction but further, is a weak cross-market basis.
+  PM led futures to the decision. If a second CB fade of this shape
+  loses, make it a rule: cross-market needs a futures read within 72h of
+  the decision.
+
+## Validated-feed list addition: IMF PortWatch chokepoint 7-day MA (2026-09-30 12:4xZ, FULL cycle, cloud)
+
+Resolution-match check done, per the DEEP-2026-09-29 sensing rule ("a
+family is added only after a resolution-match check"). The Bab el-Mandeb
+monthly-end bracket sets resolve on PortWatch's trailing 7-day MA of
+`n_total`. The keyless ArcGIS layer `Daily_Chokepoints_Data`
+(services9.arcgis.com/weJ1QsnbMYJlCHdG, `portname like '%Mandeb%'`,
+portid chokepoint4) reproduces both settled sets: Jul 31 MA 29.57 ->
+"28-30" Yes, Aug 31 MA 24.57 -> "<25" Yes. Two findings for pricing:
+brackets are `[lo, next lo)` on the unrounded MA (29.57 sat in "28-30"),
+and publication lags ~3 days (Sep 27 was the latest row on Sep 30), so at
+month-end 4 of the 7 MA days are already known. First read: forecasts
+8ca04df50d34 / ee209d78c082 / 79386cdeeda6, all no-edge (best 0.025 on
+"<25" No). The book put 7.5c on "<25" against 1c on "30-34" while the
+series gave 0/28 3-day windows low enough, so the low side may carry AIS
+information I cannot see. Grade that skew at settlement. The list is now
+Parcl, USGS M5.5+, PortWatch chokepoint MA. Hormuz uses the same layer
+but the zero-transit rows are min-touch on daily counts, not the MA, so
+the match check does not carry over to them.
+
+<!-- local-only 2026-09-28 operator notes preserved across upstream merge -->
 ## 2026-09-28 01:55Z update: one `wide-spread-veto` row settled (Burleson MLB RBI leader)
 
 | Row | own / mid | side | ask-edge | outcome | CF pnl |

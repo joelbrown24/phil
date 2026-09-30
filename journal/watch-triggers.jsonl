@@ -104,3 +104,14 @@
 {"utc": "2026-09-24T10:38:07Z", "kind": "new_market", "key": "newmarket:4904905", "market_id": "4904905", "detail": "created 2026-09-24T10:14:02.800992Z, liquidity 5492 (floor 5000)"}
 {"utc": "2026-09-25T14:38:02Z", "kind": "calendar", "key": "cal:UMich September 2026 FINAL sentiment (14:00Z) - market 4386146 bracket 46.0-48.9 Yes @0.605, forecast 3904e426ee6d (own 0.64, market-agrees; prelim 47.8) -- grade own revision-sd read (0.64) vs market (0.605) vs mech market-aware (0.80, ignored revision variance)", "market_id": null, "detail": "window 2026-09-25T14:00:00Z .. 2026-09-25T14:45:00Z"}
 {"utc": "2026-09-26T15:38:12Z", "kind": "new_market", "key": "newmarket:4984316", "market_id": "4984316", "detail": "created 2026-09-26T15:28:30.451255Z, liquidity 9631 (floor 5000)"}
+{"utc": "2026-09-28T05:22:56Z", "kind": "new_market", "key": "newmarket:5065079", "market_id": "5065079", "detail": "created 2026-09-28T05:05:16.676876Z, liquidity 5251 (floor 5000)"}
+{"utc": "2026-09-28T13:27:15Z", "kind": "new_market", "key": "newmarket:5073754", "market_id": "5073754", "detail": "created 2026-09-28T13:06:09.764585Z, liquidity 5474 (floor 5000)"}
+{"utc": "2026-09-29T21:39:12Z", "kind": "new_market", "key": "newmarket:5142582", "market_id": "5142582", "detail": "created 2026-09-29T21:28:24.807349Z, liquidity 5791 (floor 5000)"}
+{"utc": "2026-09-29T23:38:05Z", "kind": "new_market", "key": "newmarket:5143792", "market_id": "5143792", "detail": "created 2026-09-29T23:21:02.700161Z, liquidity 7268 (floor 5000)"}
+{"utc": "2026-09-29T23:38:05Z", "kind": "new_market", "key": "newmarket:5143790", "market_id": "5143790", "detail": "created 2026-09-29T23:21:02.264824Z, liquidity 16009 (floor 5000)"}
+{"utc": "2026-09-30T00:53:00Z", "kind": "price_move", "key": "pricemove:3938031", "market_id": "3938031", "detail": "0.725 -> 0.955 (+0.230) over 59 min, threshold 0.100"}
+{"utc": "2026-09-30T01:37:59Z", "kind": "new_market", "key": "newmarket:5144942", "market_id": "5144942", "detail": "created 2026-09-30T01:28:11.533913Z, liquidity 10445 (floor 5000)"}
+{"utc": "2026-09-30T01:37:59Z", "kind": "new_market", "key": "newmarket:5144941", "market_id": "5144941", "detail": "created 2026-09-30T01:28:11.284936Z, liquidity 10387 (floor 5000)"}
+{"utc": "2026-09-30T03:38:23Z", "kind": "new_market", "key": "newmarket:5146465", "market_id": "5146465", "detail": "created 2026-09-30T03:28:28.405125Z, liquidity 10503 (floor 5000)"}
+{"utc": "2026-09-30T03:38:23Z", "kind": "new_market", "key": "newmarket:5146464", "market_id": "5146464", "detail": "created 2026-09-30T03:28:28.176218Z, liquidity 11147 (floor 5000)"}
+{"utc": "2026-09-30T03:38:23Z", "kind": "new_market", "key": "newmarket:5146462", "market_id": "5146462", "detail": "created 2026-09-30T03:28:27.677189Z, liquidity 10188 (floor 5000)"}

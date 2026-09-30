@@ -3667,3 +3667,117 @@ loop.sh's Claude allowlist — loop.sh pushes after the cycle.
 GitHub ACL 403 (`joelbrown24` → `bennyjo/phil`) is a **separate** blocker;
 allowlisting does not grant write access on the remote. Local commits remain OK.
 
+
+## DEEP-2026-09-28 status pass
+
+Full detail in journal/retros/DEEP-2026-09-28.md.
+
+Hourly-agent proposals this window: none new.
+
+- **Mech + Pearl Connect (ESCALATED, carried):** last mech-requests row
+  2026-09-24T01:40Z, still "insufficient POL for gas ... prepaid mech
+  balance exhausted". R1 sample missed 5 days running. Status: ENDORSED
+  (operator act: top up the service safe with POL).
+- **NEW informational: operator runner silent again.** Last
+  operator-machine tick in cycles.log is 2026-09-27T06:12Z (~22h); all
+  ticks since are cloud. Paper learning unaffected; mech/real paths
+  cannot run. Status: INFORMATIONAL.
+- **Refusal-row dBrier column (core/counterfactual.py):** PROPOSED
+  (operator), carried.
+- Funnel-weld CI check; ODDS_API_KEY on both runners: PROPOSED
+  (operator), carried.
+
+Carried unchanged: screener quota vs two runners, per-fold dBrier
+column, real-twin allowed-classes, settled_ts determinism, wire-nonce
+401, mech delivery-size, lease writability, screener quota refund,
+watch.py shape regexes, subclass auto-tagger.
+
+**Status:** relaxation fork NOT MET (13th; no OVV settlements). 1 bet
+placed (quake <=6, count closed at 4 -> WON pending resolution), 0
+settled, 5 open. No reverts; 11 graded watch items archived out of
+schedule.json.
+
+## 2026-09-28 12:2xZ - mech gas: the top-up target is the agent EOA, not the safe (FULL cycle, operator machine)
+
+- **Correction to the ENDORSED mech item.** `wallet_info` now shows the
+  polygon service safe at 15 POL, so the "top up the service safe"
+  act has happened, but the mech path still fails the same way:
+  `insufficient funds for gas * price + value: balance
+  140390720573003474, tx cost 158856982804685966` (request
+  phil-20260928-1235-4903419-ma-r1). That balance, 0.1404 POL, is the
+  **agent EOA** (`0x3C79...1bAD`), which pays gas for the auto-deposit
+  Safe transaction. Fix: send at least ~0.5 POL to the agent EOA (a few
+  deposits' worth), or pre-fund the mech prepaid balance from the safe.
+  Status: PROPOSED (operator act). R1 sample missed 6 days running.
+
+## DEEP-2026-09-29 status pass
+
+Full detail in journal/retros/DEEP-2026-09-29.md.
+
+- **2026-09-28 12:2xZ mech gas → agent EOA:** ENDORSED. Last
+  mech-requests row: "safe holds 15 POL but EOA pays gas (0.1404 POL, tx
+  ~0.159)". Operator act: send ~0.5 POL to the agent EOA. R1 sample
+  missed 7 days. Status: ENDORSED (operator act).
+- **NEW (operator, core/screen.py, conditional):** reserve 1-2 escalation
+  slots per FULL for high-liquidity divergence-0 `low` rows whose reason
+  names a specific missing data source. The Parcl family was screened
+  362x over 14 days, always "need data", and never escalated; 38% of
+  screened rows since Sep 22 have this shape. The agent-side rotating
+  validated-feed sweep (playbook) is tested first. Status: PROPOSED
+  (operator), conditional on the 2026-10-06 sweep retirement test.
+- Carried unchanged: refusal-row dBrier column, funnel-weld CI check,
+  ODDS_API_KEY on both runners, screener quota vs two runners, per-fold
+  dBrier column, real-twin allowed-classes, settled_ts determinism,
+  wire-nonce 401, mech delivery-size, lease writability, screener quota
+  refund, watch.py shape regexes, subclass auto-tagger.
+
+**Status:** relaxation fork NOT MET (14th). 1 bet settled (quake WON
++0.62), 3 placed (Parcl trio), 7 open. No reverts; validated-feed sweep
+and first-contact family cap added.
+
+## 2026-09-29 05:1xZ - mech step: undelivered off-chain send, then wire-nonce 401 x2 (evidence for the open EOA-gas and wire-nonce items)
+
+- Off-chain R1 market-aware request phil-20260929-0512-airename-r1aware (mech id 2357e3b9...011d, service 21) was accepted, then not delivered in the 300s wait or one 240s mech_result poll.
+- The next two sequential off-chain sends on service 21 got HTTP 401 "wire nonce below sender's next expected slot". The undelivered request may hold the slot.
+- The legacy_on_chain fallback was not tried: the agent EOA was last logged at 0.1404 POL against ~0.13-0.16 POL per tx. Operator act still open: send ~0.5 POL to the agent EOA, and check whether the undelivered request was paid.
+- **Status (DEEP-2026-09-30):** ENDORSED as evidence. It adds to the open EOA-gas (~0.5 POL to the agent EOA) and wire-nonce 401 items. No new ask. The R1 daily sample has now missed 8 days.
+
+## 2026-09-29 18:0xZ - LIGHT ticks defer forecast-settlement grading: CYCLE.md step 3 and the LIGHT definition read as permitting it
+
+- Evidence: two cloud LIGHT ticks today settled rows and deferred grading to "the next FULL cycle". At 14:55Z it was the Canada GDP bet 05333272be9d, graded 70 minutes late in RETRO-20260929-1545. At 16:15Z it was 5 JOLTS forecasts, graded about 2h late in RETRO-20260929-1800. Earlier instances are on record: DEEP-2026-08-05 (b21e42c123a1, 23h late) and DEEP-2026-09-02 (2 forecasts, 19h late).
+- Cause: CYCLE.md step 3 says "only if new positions settled", which reads as ledger-only. The LIGHT tick definition says "step 1 and the open-position monitor only". The agent-side rule that overrides both lives in the schedule.json `_comment`, a 69KB file, and gets missed.
+- Ask (operator text): (a) step 3: "only if new positions OR forecasts settled since the last retro"; (b) LIGHT definition: "step 1, step 3 if step 1 settled anything, and the open-position monitor".
+- **Status (DEEP-2026-09-30):** ENDORSED (operator, CYCLE.md). The diagnosis is right. The overriding rule lives in a 69KB schedule.json `_comment` and in a playbook whose default Read stops at line 2,000 of 7,100, so the rules that matter are the ones cycles miss. Both proposed wordings are minimal and correct. Interim agent-side restatement: playbook "DEEP-2026-09-30 rulings".
+
+## DEEP-2026-09-30 - deep-retro proposals and status
+
+- **Hourly proposals this window (2):** both ENDORSED. See the Status
+  lines above.
+- **NEW (operator, CI/core, strengthens the carried funnel-weld item):**
+  2 of 7 FULL cycles on Sep 29 committed screener rows but no funnel row:
+  41b031e (15:51Z cloud) and d43503c (18:35Z operator). cycles.log
+  claimed "Funnel: screened 300" both times. The mechanical check is:
+  a commit that appends >=1 row to journal/screener.jsonl must also
+  append a row to strategy/funnel.jsonl. That fits core/validate.py or
+  the ci.yml boundary step. Agent-side interim: the playbook ruling
+  "Funnel row is not optional".
+- **NEW (operator, core/counterfactual.py, low priority):** `reconcile`
+  parses the hand-kept OVV table from strategy/playbook.md, which pins a
+  134KB section in the file every FULL cycle reads. The mechanical
+  `ledger` has superseded the table (today: hand -15.60u vs ledger
+  +14.97u, a 21-trade gap that nobody acts on). Proposal: point
+  `PLAYBOOK` at a frozen copy (e.g. strategy/playbook-archive.md, where
+  the section would move) or retire `reconcile`. Once that lands, the
+  deep retro can move the 134KB section out of the live file. Status:
+  PROPOSED.
+- Carried unchanged: refusal-row dBrier column, funnel-weld CI check,
+  ODDS_API_KEY on both runners, screener quota vs two runners, per-fold
+  dBrier column, real-twin allowed-classes, settled_ts determinism,
+  wire-nonce 401, EOA gas top-up, mech delivery-size, lease writability,
+  screener quota refund, watch.py shape regexes, subclass auto-tagger,
+  core/screen.py data-source escalation slot (conditional on the 10-06
+  sweep test).
+
+**Status:** relaxation fork NOT MET (15th). 2 bets settled (Canada GDP
+WON +3.77, RBA LOST -5.00), 0 placed, 5 open. No reverts. Playbook
+reading note and CF-arithmetic-to-retro rule added, 7 sections archived.
