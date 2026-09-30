@@ -6980,6 +6980,20 @@ on a value that differs from the API history for that date. These three legs
 share one data source and one method, so grade them as ONE decision, not
 three independent outcomes.
 
+**Graded 2026-09-30 (RETRO-20260930-1615): pre-registered condition MET.**
+All three bets won: NYC, Chicago and LA, +$1.37 total. DC 524K+ Yes and SF
+<1.176M Yes both landed on the momentum side. A re-read of the public
+history at 16:2xZ gives NYC Sep 30 = 679.19 (i.e. $679,190), in the
+settled bracket. That makes the resolver match 5/5 NYC dates. All 12 Parcl
+forecast rows landed on the favoured side, but the realised edge is thin
+(housing-index dBrier -0.010, n=9) because the book already sat at
+0.87-0.97. **Ruling: keep the zero-crossing bet rule and extend it to the
+next monthly set** (Oct 31 brackets), at the same flat $5 and with the
+same momentum legs kept forecast-only. The Oct set still takes the
+DEEP-2026-09-29 family cap of $10 total open stake, as that ruling says. This counts as ONE settled decision
+(n=1 event), not three. A loss on any zero-crossing leg still sends the
+family forecast-only.
+
 ## DEEP-2026-09-29 rulings
 
 - **AI release-date anchoring rule (abb6dcc): KEPT.** The "7 of 7" count
