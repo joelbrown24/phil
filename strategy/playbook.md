@@ -6693,6 +6693,13 @@ right at settlement, the next step is to source that hit rate (chair
 statement vs printed value, 2024 on) so the carve-out can be tested on
 it; if wrong, record that "running at about" is looser than the
 Powell-era formula and stop treating it as a staff point estimate.
+**Resolved (RETRO-20260930-1602): wrong branch.** Aug core printed 3.0
+against "about 3.2" (consensus 3.3; BofA and Cleveland 3.4), with the
+annual revision in the same release. The presser figure is a centre with
+a band of at least ±0.2, not a point estimate. It can place mass away
+from PM's carried-forward mode, which is how the 3.3 No won. It cannot
+justify a Yes on a single 0.1 bucket. In a revision month, spread the
+estimate over at least ±2 buckets around the staff figure.
 
 **Mech, same cycle (3 market-aware + 1 paired v4, all off-chain first
 try, context delivered: `market_prob_seen` equalled the sent price on all
