@@ -1336,3 +1336,13 @@ note changes what to send. The 14:20Z note on what to record stands.
   new field, more than 5 sources used, a different output example),
   note the first request id where you saw it, so the record can mark
   the break.
+
+## 2026-09-30 ~17:05Z — controlled paper FULL: mechanical / validated-feed focus (operator, Mac mini)
+
+One controlled paper FULL on the Mac mini (`env -u PEARL_CONNECT_STORE ./loop.sh 1 25`, PATH=.tools:$PATH). Hard: NEVER --real, never Pearl, floors stay min_edge 0.04 / min_edge_book_devig 0.07, no Batch E launchd.
+
+**Research / place preference this cycle:** mechanical and validated-feed families first — Parcl / housing-index, USGS quake countable, Treasury touch, crypto ladder (when mechanical), Canada GDP and other official-print econ. Prefer places where the resolution source is named and reachable and the estimate can be checked against a public feed.
+
+**Skip this cycle:** NFL / sports book-devig null chase (tight books, clean-feed edges under floor, no learning). Do not spend the research budget hunting sub-floor MLB/NFL power-devig gaps.
+
+Goal: Phil gets smarter — settle/grade mechanical theses, write durable playbook lessons when evidence warrants. Paper only.
