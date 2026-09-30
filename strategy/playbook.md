@@ -2253,6 +2253,19 @@ from the window:
    re-verification materially changes an open forecast — e.g. the open
    AfD Sachsen-Anhalt read (de95e5168de3 / forecast row) as the polls
    move before its ~Sep4-5 re-check.
+3a. **Sibling-coherence supersede + stale-snapshot rule (RETRO-20260930-1920).**
+   (i) If a read on one outcome of a mutually exclusive family makes an
+   open forecast on a sibling outcome wrong or "likely wrong", supersede
+   the sibling in the SAME cycle. Never leave a note that says so and move
+   on. Evidence: Xiaomi 367d2b7c6fe4 (0.87, Sep 27) flagged Alibaba
+   a733d6439c5a (0.88) as likely wrong, and the pair stood summing to 1.75
+   for 3 days until Alibaba LOST. (ii) Leaderboard/board fetches: when two
+   reads disagree, trust the one whose page "updated" stamp is later. A
+   fetch that returns an OLDER stamp than an earlier read is a cache
+   artefact and never grounds to discard the newer read. Evidence: the
+   Sep 23 "table dated Sep 13" supersede overrode the Sep 20 flip read
+   (f41e0b09f084, 0.65), which was the only Alibaba row pointing the right
+   way.
 
 **Exploration budget, low-media-coverage international elections (2026-08-10
 ~14:5xZ, first test of this category).** Hypothesis: "national elections
