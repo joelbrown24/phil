@@ -3088,6 +3088,25 @@ measured print (SPY LOW $760 `23a99c8fe4e8`, ES overnight + RTH-only
 window, 0.118 -> 0.08) helped by 0.0075. equity-touch now n=2, dBrier
 +0.163: forecast-only, no bets.
 
+**2026-10-01 01:3xZ (RETRO-20261001-0130): final-session touch rows.**
+Sep 30 settled 8 month-end touch rows recorded in the last 30h, and none
+of them touched. Own was above the mid on 6 of the 8, and those cost
+roughly +0.85 summed dBrier. Three of them broke rules already on this
+page, and each break gets a check:
+(a) **A barrier crossed on a feed that is not the resolver is not a
+touch.** `8f281a71373f` read a Kitco day low of 59.98 as P(already
+touched) ~0.6 and recorded 0.90. The Pyth XAG/USD resolver never printed
+60.00. On a non-resolver crossing, record touch.py from the resolver's
+own last print and put "unconfirmed cross on <feed>" in the note.
+(b) **The vol source must be dated within 5 days of the record.**
+`22345294f049` (PLTR) used an IV30 dated Sep 4 for a Sep 30 row. Stale
+IV goes in the note as a shade view, never into est_prob.
+(c) **A touch row is labelled `unvalidated-method`, whatever the edge.**
+`2256384bac80`/`a37ebc2238ee` (SPY) and `f3d1899e9d80` (silver) were
+labelled market-agrees and computed the reflection value by hand rather
+than with touch.py. Label drift hides those rows from the touch-family
+counter.
+
 **2026-09-21 20:44Z update (RETRO-20260921-2044; far-barrier split added):**
 `8d1eb46b7c32` (ETH reach $2,800, own 0.25 vs mid 0.155) settled WON, dBrier
 -0.1515. Listed, NOT counted: its note sweeps sigma 50-90%, no measured
