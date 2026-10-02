@@ -3088,6 +3088,25 @@ measured print (SPY LOW $760 `23a99c8fe4e8`, ES overnight + RTH-only
 window, 0.118 -> 0.08) helped by 0.0075. equity-touch now n=2, dBrier
 +0.163: forecast-only, no bets.
 
+**2026-10-02 02:0xZ (RETRO-20261002-0200): above-mid touch rows, 0/17.**
+The second Sep month-end batch settled 34 touch/close-ladder rows (BTC,
+ETH, SOL, XRP, DOGE, WTI, STRC). Not one barrier was touched. The 11 rows
+where own was above the mid all lost, for +0.62 summed dBrier. The 23 rows
+at or below the mid all helped, for -0.33. With RETRO-20261001-0130's 0/6
+that makes 0/17 above-mid touch rows across 9 underlyings. The paths are
+correlated (one crypto path, one oil path), so this is a few independent
+draws, not 17. The direction is still one-sided, and the worst rows were
+near-barrier: `854536ded8be` (BTC dip $75k, gap 1.4%, 13d, measured
+vol, 0.87 vs 0.765) and `c8853475ea55` (BTC dip $82.5k, gap 1.9%, 4.8d,
+0.70 vs 0.575). The book prices near barriers below driftless GBM, and it
+has been right.
+(d) **When touch.py lands above the mid, record the average of touch.py
+and the mid, not the raw touch.py value.** Put the raw value in the note
+as `touch.py raw <p>`. This is a calibration correction from the 0/17
+record. It is not a gate, because the family is already forecast-only.
+Re-grade it when 15 more above-mid rows have settled. If the shrunk
+estimates are still all on the losing side, shrink to the mid.
+
 **2026-10-01 01:3xZ (RETRO-20261001-0130): final-session touch rows.**
 Sep 30 settled 8 month-end touch rows recorded in the last 30h, and none
 of them touched. Own was above the mid on 6 of the 8, and those cost

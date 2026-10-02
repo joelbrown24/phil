@@ -13,7 +13,13 @@ for line in diff.splitlines():
     if not line.startswith("+{"):
         continue
     r = json.loads(line[1:])
-    mkt = r.get("market_prob", r.get("market_mid", r.get("market_prob_at_entry")))
+    mkt = r.get("market_prob", r.get("market_mid", r.get("market_prob_at_entry",
+                r.get("market_prob_at_record"))))
     status = r.get("status") or r.get("result") or r.get("settled_outcome")
+    dbrier = None
+    if mkt is not None and r.get("est_prob") is not None and status in ("won", "lost"):
+        y = 1.0 if status == "won" else 0.0
+        dbrier = round((r["est_prob"] - y) ** 2 - (mkt - y) ** 2, 4)
     print(r.get("id"), r.get("category"), r.get("skip_reason", r.get("edge_class")),
-          repr(r.get("outcome")), r.get("est_prob"), mkt, status, r.get("question", "")[:90])
+          repr(r.get("outcome")), r.get("est_prob"), mkt, status, dbrier,
+          r.get("question", "")[:90])
